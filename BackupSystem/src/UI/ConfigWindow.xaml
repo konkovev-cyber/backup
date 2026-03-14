@@ -242,11 +242,102 @@
                             </Grid>
                             
                             <TextBlock Text="* Старые копии будут удаляться автоматически." Style="{StaticResource HintText}" Foreground="Orange"/>
+
+                            <Separator Margin="0,8,0,16"/>
+
+                            <TextBlock Text="Расписание" Style="{DynamicResource MaterialDesignTitleMedium}" FontWeight="Bold" Margin="0,0,0,8"/>
+                            <TextBlock Text="Как часто запускать задачу:" Style="{StaticResource HintText}"/>
+                            
+                            <ComboBox SelectedValue="{Binding Schedule.Type}" SelectedValuePath="Content" Margin="0,4,0,16">
+                                <ComboBoxItem Content="daily"/>
+                                <ComboBoxItem Content="weekly"/>
+                                <ComboBoxItem Content="monthly"/>
+                                <ComboBoxItem Content="interval"/>
+                            </ComboBox>
+
+                            <StackPanel Visibility="{Binding Schedule.Type, Converter={StaticResource EqualsConverter}, ConverterParameter=daily}">
+                                <TextBlock Text="Время (ЧЧ:ММ)" Style="{StaticResource HintText}"/>
+                                <TextBox Text="{Binding Schedule.Time}" materialDesign:HintAssist.Hint="02:00" Margin="0,0,0,8"/>
+                            </StackPanel>
+
+                            <StackPanel Visibility="{Binding Schedule.Type, Converter={StaticResource EqualsConverter}, ConverterParameter=weekly}">
+                                <TextBlock Text="День недели (0-6, 0=Вс)" Style="{StaticResource HintText}"/>
+                                <TextBox Text="{Binding Schedule.DayOfWeek}" materialDesign:HintAssist.Hint="1" Margin="0,0,0,8"/>
+                                <TextBlock Text="Время (ЧЧ:ММ)" Style="{StaticResource HintText}"/>
+                                <TextBox Text="{Binding Schedule.Time}" materialDesign:HintAssist.Hint="03:00" Margin="0,0,0,8"/>
+                            </StackPanel>
+
+                            <StackPanel Visibility="{Binding Schedule.Type, Converter={StaticResource EqualsConverter}, ConverterParameter=interval}">
+                                <TextBlock Text="Интервал (минуты)" Style="{StaticResource HintText}"/>
+                                <TextBox Text="{Binding Schedule.IntervalMinutes}" materialDesign:HintAssist.Hint="60" Margin="0,0,0,8"/>
+                            </StackPanel>
                         </StackPanel>
                     </ScrollViewer>
                 </Grid>
             </TabItem>
             
+            <TabItem Header="Уведомления">
+                <ScrollViewer Margin="16">
+                    <StackPanel>
+                        <TextBlock Text="Настройки Telegram" Style="{DynamicResource MaterialDesignTitleMedium}" FontWeight="Bold" Margin="0,0,0,8"/>
+                        <CheckBox Content="Включить уведомления в Telegram" IsChecked="{Binding Global.Telegram.Enabled}" Margin="0,0,0,8"/>
+                        <TextBlock Text="API Токен бота" FontWeight="Bold" Margin="0,0,0,4"/>
+                        <TextBox Text="{Binding Global.Telegram.BotToken}" materialDesign:HintAssist.Hint="123456:ABC-DEF..." Margin="0,0,0,8"/>
+                        <TextBlock Text="ID Группы / Чата" FontWeight="Bold" Margin="0,0,0,4"/>
+                        <TextBox Text="{Binding Global.Telegram.ChatId}" materialDesign:HintAssist.Hint="-100123456789" Margin="0,0,0,16"/>
+
+                        <Button Content="Проверить Telegram" Click="TestTelegram_Click" HorizontalAlignment="Left" Style="{StaticResource MaterialDesignOutlinedButton}" Margin="0,0,0,16"/>
+
+                        <Expander Header="Как настроить Telegram бота?" IsExpanded="False" Margin="0,0,0,16">
+                            <StackPanel Margin="16,8">
+                                <TextBlock TextWrapping="Wrap" FontSize="12">
+                                    1. Найдите @BotFather в Telegram.<LineBreak/>
+                                    2. Отправьте /newbot и следуйте инструкциям.<LineBreak/>
+                                    3. Скопируйте полученный HTTP API токен в поле выше.<LineBreak/>
+                                    4. Добавьте бота в ваш чат/группу.<LineBreak/>
+                                    5. Чтобы узнать ID чата, перешлите любое сообщение из группы боту @GetMyIDBot.
+                                </TextBlock>
+                            </StackPanel>
+                        </Expander>
+
+                        <Separator Margin="0,8,0,16"/>
+
+                        <TextBlock Text="Настройки Email (SMTP)" Style="{DynamicResource MaterialDesignTitleMedium}" FontWeight="Bold" Margin="0,0,0,8"/>
+                        <TextBlock Text="SMTP Сервер" FontWeight="Bold" Margin="0,0,0,4"/>
+                        <TextBox Text="{Binding Global.Smtp.Host}" materialDesign:HintAssist.Hint="smtp.mail.ru" Margin="0,0,0,8"/>
+                        <TextBlock Text="Порт" FontWeight="Bold" Margin="0,0,0,4"/>
+                        <TextBox Text="{Binding Global.Smtp.Port}" materialDesign:HintAssist.Hint="465" Margin="0,0,0,8"/>
+                        <TextBlock Text="Пользователь" FontWeight="Bold" Margin="0,0,0,4"/>
+                        <TextBox Text="{Binding Global.Smtp.Username}" Margin="0,0,0,8"/>
+                        <TextBlock Text="Пароль" FontWeight="Bold" Margin="0,0,0,4"/>
+                        <PasswordBox x:Name="SmtpPasswordBox" Margin="0,0,0,16"/>
+                        
+                        <Button Content="Проверить SMTP" Click="TestSmtp_Click" HorizontalAlignment="Left" Style="{StaticResource MaterialDesignOutlinedButton}"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <TabItem Header="Расширенные">
+                <ScrollViewer Margin="16" DataContext="{Binding SelectedItem, ElementName=JobsListBox}">
+                    <StackPanel>
+                        <TextBlock Text="Скрипты и автоматизация" Style="{DynamicResource MaterialDesignTitleLarge}" Margin="0,0,0,16"/>
+                        
+                        <TextBlock Text="Скрипт ПЕРЕД выполнением" FontWeight="Bold" Margin="0,0,0,4"/>
+                        <TextBlock Text="Запустится перед началом бекапа (например, stop service)" Style="{StaticResource HintText}"/>
+                        <TextBox Text="{Binding Hooks.BeforeScript}" materialDesign:HintAssist.Hint="net stop MyService" Margin="0,0,0,16"/>
+
+                        <TextBlock Text="Скрипт ПОСЛЕ выполнения" FontWeight="Bold" Margin="0,0,0,4"/>
+                        <TextBlock Text="Запустится по завершении (например, start service)" Style="{StaticResource HintText}"/>
+                        <TextBox Text="{Binding Hooks.AfterScript}" materialDesign:HintAssist.Hint="net start MyService" Margin="0,0,0,16"/>
+                        
+                        <Separator Margin="0,8,0,16"/>
+                        
+                        <TextBlock Text="Теневое копирование (VSS)" Style="{DynamicResource MaterialDesignTitleMedium}" FontWeight="Bold" Margin="0,0,0,8"/>
+                        <CheckBox Content="Использовать Volume Shadow Copy (для открытых файлов)" IsEnabled="False" IsChecked="True" ToolTip="Включено по умолчанию для обеспечения целостности данных"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
             <TabItem Header="Общие">
                 <ScrollViewer Margin="16">
                     <StackPanel>

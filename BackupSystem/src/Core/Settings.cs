@@ -27,6 +27,7 @@ public class NotificationSettings
     public bool OnSuccess { get; set; } = false;
     public bool OnFailure { get; set; } = true;
     public SmtpSettings? Smtp { get; set; }
+    public TelegramSettings? Telegram { get; set; }
 }
 
 public class SmtpSettings
@@ -37,4 +38,25 @@ public class SmtpSettings
     public string Username { get; set; } = "";
     public string Password { get; set; } = "";
     public string From { get; set; } = "";
+}
+
+public class TelegramSettings
+{
+    public bool Enabled { get; set; } = false;
+    public string BotToken { get; set; } = "";
+    public string ChatId { get; set; } = "";
+}
+
+public class BackupHistory
+{
+    public string Id { get; set; } = Guid.NewGuid().ToString();
+    public string JobId { get; set; } = "";
+    public string JobName { get; set; } = "";
+    public DateTime Timestamp { get; set; }
+    public bool Success { get; set; }
+    public string? Message { get; set; }
+    public string? LocalFilePath { get; set; }
+    public List<string> RemoteFilePaths { get; set; } = new();
+    public long SizeBytes { get; set; }
+    public string? Hash { get; set; }
 }

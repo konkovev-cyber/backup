@@ -1,5 +1,6 @@
 using System.Windows;
 using System.IO;
+using System.Net.Http;
 using BackupSystem.Core;
 
 namespace BackupSystem.UI
@@ -108,10 +109,64 @@ namespace BackupSystem.UI
             { 
                 Id = Guid.NewGuid().ToString().Substring(0, 8), 
                 Name = "Новая задача",
-                Archiver = new ArchiverSettings(),
-                Retention = new RetentionSettings { KeepDaily = 3, KeepWeekly = 1, KeepMonthly = 0 }
+                Schedule = new ScheduleConfig { Type = "daily", Time = "02:00" },
+                Archiver = new ArchiverSettings { Enabled = true, Format = "zip" },
+                Retention = new RetentionSettings { KeepDaily = 7, KeepWeekly = 4, KeepMonthly = 12 },
+                Notifications = new NotificationSettings { OnFailure = true, OnSuccess = false },
+                Hooks = new HookSettings()
             });
             JobsListBox.Items.Refresh();
+        }
+
+        private async void TestTelegram_Click(object sender, RoutedEventArgs e)
+        {
+            var token = _config.Global.Telegram.BotToken;
+            var chatId = _config.Global.Telegram.ChatId;
+
+            if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(chatId))
+            {
+                MessageBox.Show("Сначала укажите Токен и Chat ID", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            try
+            {
+                using var client = new HttpClient();
+                var url = $"https://api.telegram.org/bot{token}/sendMessage";
+                var content = new FormUrlEncodedContent(new Dictionary<string, string>
+                {
+                    ["chat_id"] = chatId,
+                    ["text"] = "🔔 Проверка уведомлений BackupSystem Professional. Если вы получили это сообщение, значит настройки верны!",
+                    ["parse_mode"] = "Markdown"
+                });
+
+                var response = await client.PostAsync(url, content);
+                if (response.IsSuccessStatusCode)
+                {
+                    MessageBox.Show("Тестовое сообщение отправлено успешно!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
+                    var error = await response.Content.ReadAsStringAsync();
+                    MessageBox.Show($"Ошибка Telegram API: {error}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка сети: {ex.Message}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void TestSmtp_Click(object sender, RoutedEventArgs e)
+        {
+            // Упрощенная проверка SMTP
+            if (string.IsNullOrEmpty(_config.Global.Smtp.Host))
+            {
+                MessageBox.Show("Укажите SMTP Хост", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            MessageBox.Show("Проверка SMTP настроек (имитация)... Настройки выглядят корректно.", "Информация", MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
 

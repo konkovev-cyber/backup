@@ -9,6 +9,7 @@ public class BackupConfiguration
     public List<SourceConfig> Sources { get; set; } = new();
     public List<DestinationConfig> Destinations { get; set; } = new();
     public List<JobConfig> Jobs { get; set; } = new();
+    public List<BackupHistory> History { get; set; } = new();
     public GlobalSettings Global { get; set; } = new();
 }
 
@@ -65,10 +66,17 @@ public class JobConfig
     public bool Enabled { get; set; } = true;
     public List<string> SourceIds { get; set; } = new();
     public List<string> DestinationIds { get; set; } = new();
-    public ScheduleConfig? Schedule { get; set; }
+    public ScheduleConfig? Schedule { get; set; } = new();
     public ArchiverSettings? Archiver { get; set; } = new();
     public RetentionSettings? Retention { get; set; } = new();
-    public NotificationSettings? Notifications { get; set; }
+    public NotificationSettings? Notifications { get; set; } = new();
+    public HookSettings? Hooks { get; set; } = new();
+}
+
+public class HookSettings
+{
+    public string? BeforeScript { get; set; }
+    public string? AfterScript { get; set; }
 }
 
 public class ScheduleConfig
@@ -89,4 +97,6 @@ public class GlobalSettings
     public int OperationTimeoutMinutes { get; set; } = 60;
     public int RetryCount { get; set; } = 3;
     public int RetryDelaySeconds { get; set; } = 30;
+    public SmtpSettings Smtp { get; set; } = new();
+    public TelegramSettings Telegram { get; set; } = new();
 }

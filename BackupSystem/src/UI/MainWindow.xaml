@@ -12,6 +12,8 @@
         Background="{DynamicResource MaterialDesignPaper}">
     
     <Window.Resources>
+        <local:BooleanToStatusConverter x:Key="BooleanToStatusConverter" xmlns:local="clr-namespace:BackupSystem.UI"/>
+        <local:SizeConverter x:Key="SizeConverter" xmlns:local="clr-namespace:BackupSystem.UI"/>
         <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignRaisedButton}">
             <Setter Property="Margin" Value="4"/>
         </Style>
@@ -70,123 +72,157 @@
         </Border>
         
         <!-- Main Content -->
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="320"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            
-            <!-- Left Panel - Jobs List -->
-            <Border Grid.Column="0" Background="{DynamicResource MaterialDesignPaper}" 
-                    CornerRadius="12" Padding="16" Margin="0,0,8,0"
-                    Effect="{StaticResource MaterialDesignShadowDepth1}">
+        <TabControl Grid.Row="1" materialDesign:ColorZoneAssist.Mode="Standard">
+            <TabItem Header="ЗАДАЧИ">
                 <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="320"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
                     
-                    <TextBlock Grid.Row="0" Text="Задачи бекапа" 
-                               Style="{DynamicResource MaterialDesignTitleLarge}"
-                               Foreground="{DynamicResource MaterialDesignBody}"
-                               Margin="0,0,0,4"/>
-                    <TextBlock Grid.Row="1" Text="Выберите задачу для управления" 
-                               Style="{DynamicResource HintText}"/>
-                    
-                    <ListBox x:Name="JobsListBox" Grid.Row="2"
-                             SelectionChanged="JobsListBox_SelectionChanged"
-                             ScrollViewer.VerticalScrollBarVisibility="Auto"
-                             BorderThickness="0"
-                             materialDesign:ListBoxItemAssist.CornerRadius="8">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <Border Padding="12" Margin="0,4" Background="{DynamicResource MaterialDesignSelection}" CornerRadius="8">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="*"/>
-                                        </Grid.ColumnDefinitions>
-                                        
-                                        <materialDesign:PackIcon Kind="FileCabinet" VerticalAlignment="Center" Margin="0,0,12,0" Opacity="0.7"/>
-                                        
-                                        <StackPanel Grid.Column="1">
-                                            <TextBlock Text="{Binding Name}" 
-                                                       FontWeight="SemiBold" 
-                                                       FontSize="15" 
-                                                       Foreground="{DynamicResource MaterialDesignBody}"/>
-                                            <TextBlock Text="{Binding Status}" 
-                                                       FontSize="12" 
-                                                       Opacity="0.6"
-                                                       Foreground="{DynamicResource MaterialDesignBody}"/>
-                                        </StackPanel>
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-                </Grid>
-            </Border>
-            
-            <!-- Right Panel - Details -->
-            <Border Grid.Column="1" Background="{DynamicResource MaterialDesignPaper}" 
-                    CornerRadius="12" Padding="20" Margin="8,0,0,0"
-                    Effect="{StaticResource MaterialDesignShadowDepth1}">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    
-                    <!-- Job Info -->
-                    <StackPanel Grid.Row="0" Margin="0,0,0,20">
-                        <TextBlock x:Name="JobNameText" Text="Выберите задачу" 
-                                   Style="{DynamicResource MaterialDesignHeadlineSmall}"
-                                   Foreground="{DynamicResource MaterialDesignBody}"
-                                   FontWeight="Bold"/>
-                        <TextBlock x:Name="JobDescriptionText" 
-                                   Text="Здесь появится детальная информация о выбранном бекапе" 
-                                   Style="{DynamicResource HintText}"
-                                   FontSize="14" Margin="0,4,0,0"/>
-                    </StackPanel>
-                    
-                    <!-- Progress Section -->
-                    <StackPanel Grid.Row="1" Margin="0,0,0,20">
-                        <Grid Margin="0,0,0,8">
-                            <TextBlock Text="Прогресс выполнения" FontWeight="SemiBold" Opacity="0.8" Foreground="{DynamicResource MaterialDesignBody}"/>
-                            <TextBlock x:Name="ProgressText" Text="0%" HorizontalAlignment="Right" FontWeight="Bold" Foreground="{DynamicResource MaterialDesignBody}"/>
-                        </Grid>
-                        <ProgressBar x:Name="Progress_bar" 
-                                     Minimum="0" Maximum="100" 
-                                     Height="12" Value="0"
-                                     materialDesign:TransitionAssist.DisableTransitions="True"
-                                     Style="{DynamicResource MaterialDesignLinearProgressBar}"/>
-                    </StackPanel>
-                    
-                    <TextBlock Grid.Row="2" Text="Лог выполнения операции" 
-                               FontWeight="SemiBold" Margin="0,0,0,8" Opacity="0.8" Foreground="{DynamicResource MaterialDesignBody}"/>
-                    
-                    <!-- Log -->
-                    <Border Grid.Row="3" Background="#0C000000" 
-                            CornerRadius="8" Padding="12">
-                        <ScrollViewer VerticalScrollBarVisibility="Auto">
-                            <TextBox x:Name="LogTextBox" 
-                                     TextWrapping="Wrap" 
-                                     IsReadOnly="True" 
+                    <!-- Left Panel - Jobs List -->
+                    <Border Grid.Column="0" Background="{DynamicResource MaterialDesignPaper}" 
+                            CornerRadius="12" Padding="16" Margin="0,0,8,0"
+                            Effect="{StaticResource MaterialDesignShadowDepth1}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            
+                            <TextBlock Grid.Row="0" Text="Задачи бекапа" 
+                                       Style="{DynamicResource MaterialDesignTitleLarge}"
+                                       Foreground="{DynamicResource MaterialDesignBody}"
+                                       Margin="0,0,0,4"/>
+                            <TextBlock Grid.Row="1" Text="Выберите задачу для управления" 
+                                       Style="{DynamicResource HintText}"/>
+                            
+                            <ListBox x:Name="JobsListBox" Grid.Row="2"
+                                     SelectionChanged="JobsListBox_SelectionChanged"
+                                     ScrollViewer.VerticalScrollBarVisibility="Auto"
                                      BorderThickness="0"
-                                     Background="Transparent"
-                                     FontFamily="Consolas"
-                                     FontSize="13"
-                                     AcceptsReturn="True"
-                                     Foreground="{DynamicResource MaterialDesignBody}"
-                                     VerticalContentAlignment="Top"/>
-                        </ScrollViewer>
+                                     materialDesign:ListBoxItemAssist.CornerRadius="8">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Padding="12" Margin="0,4" Background="{DynamicResource MaterialDesignSelection}" CornerRadius="8">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                
+                                                <materialDesign:PackIcon Kind="FileCabinet" VerticalAlignment="Center" Margin="0,0,12,0" Opacity="0.7"/>
+                                                
+                                                <StackPanel Grid.Column="1">
+                                                    <TextBlock Text="{Binding Name}" 
+                                                               FontWeight="SemiBold" 
+                                                               FontSize="15" 
+                                                               Foreground="{DynamicResource MaterialDesignBody}"/>
+                                                    <TextBlock Text="{Binding Status}" 
+                                                               FontSize="12" 
+                                                               Opacity="0.6"
+                                                               Foreground="{DynamicResource MaterialDesignBody}"/>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Grid>
+                    </Border>
+                    
+                    <!-- Right Panel - Details -->
+                    <Border Grid.Column="1" Background="{DynamicResource MaterialDesignPaper}" 
+                            CornerRadius="12" Padding="20" Margin="8,0,0,0"
+                            Effect="{StaticResource MaterialDesignShadowDepth1}">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            
+                            <!-- Job Info -->
+                            <StackPanel Grid.Row="0" Margin="0,0,0,20">
+                                <TextBlock x:Name="JobNameText" Text="Выберите задачу" 
+                                           Style="{DynamicResource MaterialDesignHeadlineSmall}"
+                                           Foreground="{DynamicResource MaterialDesignBody}"
+                                           FontWeight="Bold"/>
+                                <TextBlock x:Name="JobDescriptionText" 
+                                           Text="Здесь появится детальная информация о выбранном бекапе" 
+                                           Style="{DynamicResource HintText}"
+                                           FontSize="14" Margin="0,4,0,0"/>
+                            </StackPanel>
+                            
+                            <!-- Progress Section -->
+                            <StackPanel Grid.Row="1" Margin="0,0,0,20">
+                                <Grid Margin="0,0,0,8">
+                                    <TextBlock Text="Прогресс выполнения" FontWeight="SemiBold" Opacity="0.8" Foreground="{DynamicResource MaterialDesignBody}"/>
+                                    <TextBlock x:Name="ProgressText" Text="0%" HorizontalAlignment="Right" FontWeight="Bold" Foreground="{DynamicResource MaterialDesignBody}"/>
+                                </Grid>
+                                <ProgressBar x:Name="Progress_bar" 
+                                             Minimum="0" Maximum="100" 
+                                             Height="12" Value="0"
+                                             materialDesign:TransitionAssist.DisableTransitions="True"
+                                             Style="{DynamicResource MaterialDesignLinearProgressBar}"/>
+                            </StackPanel>
+                            
+                            <TextBlock Grid.Row="2" Text="Лог выполнения операции" 
+                                       FontWeight="SemiBold" Margin="0,0,0,8" Opacity="0.8" Foreground="{DynamicResource MaterialDesignBody}"/>
+                            
+                            <!-- Log -->
+                            <Border Grid.Row="3" Background="#0C000000" 
+                                    CornerRadius="8" Padding="12">
+                                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                    <TextBox x:Name="LogTextBox" 
+                                             TextWrapping="Wrap" 
+                                             IsReadOnly="True" 
+                                             BorderThickness="0"
+                                             Background="Transparent"
+                                             FontFamily="Consolas"
+                                             FontSize="13"
+                                             AcceptsReturn="True"
+                                             Foreground="{DynamicResource MaterialDesignBody}"
+                                             VerticalContentAlignment="Top"/>
+                                </ScrollViewer>
+                            </Border>
+                        </Grid>
                     </Border>
                 </Grid>
-            </Border>
-        </Grid>
+            </TabItem>
+            
+            <TabItem Header="ИСТОРИЯ">
+                <Border Background="{DynamicResource MaterialDesignPaper}" CornerRadius="12" Padding="16" Effect="{StaticResource MaterialDesignShadowDepth1}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        
+                        <TextBlock Grid.Row="0" Text="История резервного копирования" Style="{DynamicResource MaterialDesignTitleLarge}" Margin="0,0,0,16"/>
+                        
+                        <DataGrid Grid.Row="1" x:Name="HistoryDataGrid" AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Время" Binding="{Binding Timestamp, StringFormat={}{0:dd.MM.yyyy HH:mm:ss}}" Width="150"/>
+                                <DataGridTextColumn Header="Задача" Binding="{Binding JobName}" Width="150"/>
+                                <DataGridTextColumn Header="Статус" Binding="{Binding Success, Converter={StaticResource BooleanToStatusConverter}}" Width="100"/>
+                                <DataGridTextColumn Header="Размер" Binding="{Binding SizeBytes, Converter={StaticResource SizeConverter}}" Width="100"/>
+                                <DataGridTextColumn Header="Сообщение" Binding="{Binding Message}" Width="*"/>
+                                <DataGridTemplateColumn Header="Действия" Width="120">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Content="Восстановить" Style="{StaticResource MaterialDesignFlatButton}" Click="RestoreButton_Click" IsEnabled="{Binding Success}"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </Border>
+            </TabItem>
+        </TabControl>
         
         <!-- Footer -->
         <Border Grid.Row="2" Margin="0,16,0,0" Padding="8,0" Background="#05000000" CornerRadius="8">

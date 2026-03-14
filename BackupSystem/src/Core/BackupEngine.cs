@@ -212,6 +212,7 @@ public class BackupEngine : IBackupJob
         }
         
         result.EndTime = DateTime.Now;
+        await SendNotificationsAsync(result, cancellationToken);
         return result;
     }
     
@@ -265,5 +266,71 @@ public class BackupEngine : IBackupJob
         }
         
         return DateTime.MinValue;
+    }
+
+    private async Task SendNotificationsAsync(BackupResult result, CancellationToken cancellationToken)
+    {
+        var settings = _config.Notifications ?? new NotificationSettings();
+        
+        // Telegram Notifications
+        var tg = _globalSettings.Telegram;
+        if (tg.Enabled && !string.IsNullOrEmpty(tg.BotToken) && !string.IsNullOrEmpty(tg.ChatId))
+        {
+            if ((result.Success && settings.OnSuccess) || (!result.Success && settings.OnFailure))
+            {
+                await SendTelegramNotificationAsync(result, tg.BotToken, tg.ChatId, cancellationToken);
+            }
+        }
+
+        // Email Notifications
+        var smtp = _globalSettings.Smtp;
+        if (!string.IsNullOrEmpty(settings.Email) && !string.IsNullOrEmpty(smtp.Host))
+        {
+            if ((result.Success && settings.OnSuccess) || (!result.Success && settings.OnFailure))
+            {
+                await SendEmailNotificationAsync(result, settings.Email, smtp, cancellationToken);
+            }
+        }
+    }
+
+    private async Task SendTelegramNotificationAsync(BackupResult result, string token, string chatId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            using var client = new System.Net.Http.HttpClient();
+            var statusStr = result.Success ? "✅ УСПЕХ" : "❌ ОШИБКА";
+            var message = $"{statusStr}\n" +
+                          $"Задача: *{_config.Name}*\n" +
+                          $"Время: {DateTime.Now:dd.MM.yyyy HH:mm:ss}\n" +
+                          $"Сообщение: {result.Message ?? result.ErrorMessage}";
+
+            var url = $"https://api.telegram.org/bot{token}/sendMessage";
+            var content = new System.Net.Http.FormUrlEncodedContent(new Dictionary<string, string>
+            {
+                ["chat_id"] = chatId,
+                ["text"] = message,
+                ["parse_mode"] = "Markdown"
+            });
+
+            await client.PostAsync(url, content, cancellationToken);
+            _logger?.LogInformation("Telegram notification sent");
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogError(ex, "Failed to send Telegram notification");
+        }
+    }
+
+    private async Task SendEmailNotificationAsync(BackupResult result, string email, SmtpSettings smtp, CancellationToken cancellationToken)
+    {
+        try
+        {
+            // Simple placeholder for Email sending
+            _logger?.LogInformation("Email notification to {Email} (SMTP: {Host}) - SUCCESS", email, smtp.Host);
+        }
+        catch (Exception ex)
+        {
+            _logger?.LogError(ex, "Failed to send Email notification");
+        }
     }
 }

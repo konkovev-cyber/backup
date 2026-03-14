@@ -225,6 +225,20 @@ public class BackupExecutionJob : IJob
             var engine = new BackupEngine(config, sources!, destinations!, globalSettings, archiver, engineLogger);
             var result = await engine.RunAsync(context.CancellationToken);
             
+            // Запись в историю
+            var historyItem = new BackupHistory
+            {
+                JobId = config.Id,
+                JobName = config.Name,
+                Timestamp = result.EndTime,
+                Success = result.Success,
+                Message = result.Success ? "Выполнено успешно" : result.ErrorMessage,
+                SizeBytes = result.TotalBytesProcessed
+            };
+
+            // Сохранение истории в backup.json
+            await SaveHistoryAsync(historyItem, logger);
+
             if (result.Success)
             {
                 logger?.LogInformation("Job {JobName} completed successfully", config.Name);
@@ -237,6 +251,39 @@ public class BackupExecutionJob : IJob
         catch (Exception ex)
         {
             logger?.LogError(ex, "Unexpected error executing job {JobId}", jobId);
+        }
+    }
+
+    private async Task SaveHistoryAsync(BackupHistory item, ILogger? logger)
+    {
+        try
+        {
+            var configPath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+                "BackupSystem",
+                "backup.json");
+
+            if (!File.Exists(configPath)) return;
+
+            // Блокировка файла для совместного доступа (упрощенно)
+            var json = await File.ReadAllTextAsync(configPath);
+            var options = new System.Text.Json.JsonSerializerOptions { PropertyNameCaseInsensitive = true, WriteIndented = true };
+            var config = System.Text.Json.JsonSerializer.Deserialize<BackupConfiguration>(json, options);
+
+            if (config != null)
+            {
+                config.History.Add(item);
+                // Ограничиваем историю 1000 записями
+                if (config.History.Count > 1000)
+                    config.History = config.History.OrderByDescending(h => h.Timestamp).Take(1000).ToList();
+
+                var newJson = System.Text.Json.JsonSerializer.Serialize(config, options);
+                await File.WriteAllTextAsync(configPath, newJson);
+            }
+        }
+        catch (Exception ex)
+        {
+            logger?.LogError(ex, "Failed to save history to file");
         }
     }
 }
