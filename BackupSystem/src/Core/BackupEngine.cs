@@ -188,6 +188,7 @@ public class BackupEngine : IBackupJob
             
             result.EndTime = DateTime.Now;
             result.Success = true;
+            result.Message = "Резервное копирование завершено успешно";
             
             _logger?.LogInformation("Backup job completed: {JobName}, {Bytes} bytes processed", 
                 _config.Name, result.TotalBytesProcessed);
