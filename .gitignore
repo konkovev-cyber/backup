@@ -1,0 +1,26 @@
+# .NET
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+*.log
+*.user
+*.suo
+*.sln.docstates
+.vs/
+publish/
+
+# System
+Thumbs.db
+Desktop.ini
+
+# Agent files
+.agent/
+.agent-memory/
+.agent-signal.md
+agent.ps1
+agent-init.ps1
+jarvis.ps1
+agent-dashboard.html
+agent-data.js
+AGENT_SETUP.md
+QUICKSTART.md

@@ -1,0 +1,289 @@
+{
+  "version": "1.0",
+  "sources": [
+    {
+      "id": "sql-buhgalteria",
+      "type": "sqlserver",
+      "name": "Бухгалтерия SQL",
+      "enabled": true,
+      "settings": {
+        "server": "localhost\\SQLEXPRESS",
+        "database": "Buhgalteria",
+        "useIntegratedSecurity": "true",
+        "username": "",
+        "password": "",
+        "backupType": "full",
+        "checkIntegrity": "true"
+      }
+    },
+    {
+      "id": "sql-torgovlya",
+      "type": "sqlserver",
+      "name": "Торговля SQL",
+      "enabled": true,
+      "settings": {
+        "server": "192.168.1.100",
+        "database": "TradeDB",
+        "useIntegratedSecurity": "false",
+        "username": "backup_user",
+        "password": "${ENCRYPTED:AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAA}",
+        "backupType": "differential",
+        "checkIntegrity": "false"
+      }
+    },
+    {
+      "id": "1c-ut",
+      "type": "ones",
+      "name": "1С:Управление торговлей",
+      "enabled": true,
+      "settings": {
+        "platformPath": "C:\\Program Files\\1cv8\\current",
+        "ibPath": "\\\\server\\1c_bases\\UT",
+        "dbType": "mssql",
+        "dbServer": "192.168.1.100",
+        "dbName": "UT_DB",
+        "dbUser": "sa",
+        "dbPassword": "${ENCRYPTED:AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAA}",
+        "backupType": "full"
+      }
+    },
+    {
+      "id": "1c-zup",
+      "type": "ones",
+      "name": "1С:Зарплата и управление персоналом",
+      "enabled": true,
+      "settings": {
+        "platformPath": "C:\\Program Files\\1cv8\\current",
+        "ibPath": "C:\\1C_Bases\\ZUP",
+        "dbType": "file",
+        "backupType": "full"
+      }
+    },
+    {
+      "id": "files-documents",
+      "type": "files",
+      "name": "Документы офиса",
+      "enabled": true,
+      "settings": {
+        "paths": [
+          "C:\\Users\\Public\\Documents",
+          "D:\\Contracts",
+          "D:\\Reports"
+        ],
+        "includeFilters": [
+          "*.docx",
+          "*.xlsx",
+          "*.pptx",
+          "*.pdf",
+          "*.doc",
+          "*.xls"
+        ],
+        "excludeFilters": [
+          "*.tmp",
+          "~$*",
+          "*.~*",
+          "Desktop.ini",
+          "Thumbs.db"
+        ],
+        "includeSubfolders": "true",
+        "followJunctions": "false"
+      }
+    },
+    {
+      "id": "files-configs",
+      "type": "files",
+      "name": "Конфигурации 1С",
+      "enabled": true,
+      "settings": {
+        "paths": [
+          "C:\\1C_Bases",
+          "\\\\server\\1c_bases"
+        ],
+        "includeFilters": [
+          "*.cf",
+          "*.cfu",
+          "*.dt",
+          "*.xml"
+        ],
+        "excludeFilters": [],
+        "includeSubfolders": "true",
+        "followJunctions": "false"
+      }
+    }
+  ],
+  "destinations": [
+    {
+      "id": "nas-local",
+      "type": "network",
+      "name": "Локальный NAS",
+      "enabled": true,
+      "settings": {
+        "uncPath": "\\\\NAS\\Backup",
+        "username": "backup",
+        "password": "${ENCRYPTED:AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAA}",
+        "createSubfolder": "true",
+        "subfolderFormat": "yyyy-MM-dd"
+      }
+    },
+    {
+      "id": "ftp-office",
+      "type": "ftp",
+      "name": "Офисный FTP",
+      "enabled": true,
+      "settings": {
+        "host": "backup.example.com",
+        "port": "21",
+        "protocol": "ftps",
+        "username": "backup_user",
+        "password": "${ENCRYPTED:AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAA}",
+        "remotePath": "/backups/office",
+        "passiveMode": "true",
+        "sslProtocols": "Tls12"
+      }
+    },
+    {
+      "id": "sftp-offsite",
+      "type": "ftp",
+      "name": "Внешний SFTP",
+      "enabled": false,
+      "settings": {
+        "host": "offsite.backup.com",
+        "port": "22",
+        "protocol": "sftp",
+        "username": "backup",
+        "password": "${ENCRYPTED:AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAA}",
+        "remotePath": "/incoming",
+        "passiveMode": "true",
+        "sshKeyPath": "C:\\Users\\Admin\\.ssh\\id_rsa"
+      }
+    }
+  ],
+  "jobs": [
+    {
+      "id": "job-daily-full",
+      "name": "Ежедневный полный бекап",
+      "enabled": true,
+      "sourceIds": [
+        "sql-buhgalteria",
+        "1c-ut",
+        "files-documents"
+      ],
+      "destinationIds": [
+        "nas-local",
+        "ftp-office"
+      ],
+      "schedule": {
+        "type": "daily",
+        "time": "23:00"
+      },
+      "archiver": {
+        "enabled": true,
+        "format": "7z",
+        "compressionLevel": "normal",
+        "splitSize": 4294967296,
+        "password": "",
+        "deleteSourceAfterArchive": true
+      },
+      "retention": {
+        "keepDaily": 7,
+        "keepWeekly": 4,
+        "keepMonthly": 12,
+        "minFreeSpace": 1073741824
+      },
+      "notifications": {
+        "email": "admin@company.com",
+        "onSuccess": false,
+        "onFailure": true,
+        "smtp": {
+          "host": "smtp.company.com",
+          "port": 587,
+          "enableSsl": true,
+          "username": "notifications@company.com",
+          "password": "${ENCRYPTED:AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAA}",
+          "from": "backup-system@company.com"
+        }
+      }
+    },
+    {
+      "id": "job-weekly-archive",
+      "name": "Еженедельный архив",
+      "enabled": true,
+      "sourceIds": [
+        "sql-buhgalteria",
+        "sql-torgovlya",
+        "1c-ut",
+        "1c-zup",
+        "files-documents",
+        "files-configs"
+      ],
+      "destinationIds": [
+        "nas-local"
+      ],
+      "schedule": {
+        "type": "weekly",
+        "time": "02:00",
+        "dayOfWeek": 0
+      },
+      "archiver": {
+        "enabled": true,
+        "format": "7z",
+        "compressionLevel": "ultra",
+        "splitSize": 0,
+        "password": "${ENCRYPTED:AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAA}",
+        "deleteSourceAfterArchive": false
+      },
+      "retention": {
+        "keepDaily": 0,
+        "keepWeekly": 8,
+        "keepMonthly": 24,
+        "minFreeSpace": 5368709120
+      },
+      "notifications": {
+        "email": "admin@company.com",
+        "onSuccess": true,
+        "onFailure": true
+      }
+    },
+    {
+      "id": "job-hourly-sql",
+      "name": "Почасовой бекап SQL",
+      "enabled": false,
+      "sourceIds": [
+        "sql-buhgalteria"
+      ],
+      "destinationIds": [
+        "nas-local"
+      ],
+      "schedule": {
+        "type": "interval",
+        "intervalMinutes": 60
+      },
+      "archiver": {
+        "enabled": true,
+        "format": "zip",
+        "compressionLevel": "fast",
+        "splitSize": 0,
+        "deleteSourceAfterArchive": true
+      },
+      "retention": {
+        "keepDaily": 1,
+        "keepWeekly": 0,
+        "keepMonthly": 0,
+        "minFreeSpace": 1073741824
+      },
+      "notifications": {
+        "onSuccess": false,
+        "onFailure": true
+      }
+    }
+  ],
+  "global": {
+    "tempPath": "C:\\ProgramData\\BackupSystem\\Temp",
+    "logPath": "C:\\ProgramData\\BackupSystem\\Logs",
+    "logLevel": "Info",
+    "maxConcurrentJobs": 1,
+    "operationTimeoutMinutes": 120,
+    "retryCount": 3,
+    "retryDelaySeconds": 30
+  }
+}
