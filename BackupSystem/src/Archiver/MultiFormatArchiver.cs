@@ -3,6 +3,7 @@ using SharpCompress.Archives.Zip;
 using SharpCompress.Archives.SevenZip;
 using SharpCompress.Common;
 using SharpCompress.Writers;
+using SharpCompress.Readers;
 using BackupSystem.Core;
 using System.IO;
 using ICSharpCode.SharpZipLib.Zip;
@@ -79,7 +80,7 @@ public class MultiFormatArchiver : IArchiver
         };
 
         using var fs = File.Create(destinationPath);
-        using var writer = WriterFactory.Open(fs, archiveType, writerOptions);
+        using var writer = SharpCompress.Writers.WriterFactory.Open(fs, archiveType, writerOptions);
 
         var paths = sourcePaths.ToList();
         foreach (var path in paths)
@@ -102,7 +103,7 @@ public class MultiFormatArchiver : IArchiver
         {
             try
             {
-                using (var archive = ArchiveFactory.Open(archivePath, new ReaderOptions { Password = password }))
+                using (var archive = SharpCompress.Archives.ArchiveFactory.Open(archivePath, new SharpCompress.Readers.ReaderOptions { Password = password }))
                 {
                     foreach (var entry in archive.Entries)
                     {
