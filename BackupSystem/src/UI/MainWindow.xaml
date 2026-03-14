@@ -14,6 +14,8 @@
     <Window.Resources>
         <local:BooleanToStatusConverter x:Key="BooleanToStatusConverter" xmlns:local="clr-namespace:BackupSystem.UI"/>
         <local:SizeConverter x:Key="SizeConverter" xmlns:local="clr-namespace:BackupSystem.UI"/>
+        <local:StatusToIconConverter x:Key="StatusToIconConverter" xmlns:local="clr-namespace:BackupSystem.UI"/>
+        <local:StatusToColorConverter x:Key="StatusToColorConverter" xmlns:local="clr-namespace:BackupSystem.UI"/>
         <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignRaisedButton}">
             <Setter Property="Margin" Value="4"/>
         </Style>
@@ -73,7 +75,13 @@
         
         <!-- Main Content -->
         <TabControl Grid.Row="1" materialDesign:ColorZoneAssist.Mode="Standard">
-            <TabItem Header="ЗАДАЧИ">
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="PlaylistCheck" Margin="0,0,8,0"/>
+                        <TextBlock Text="ЗАДАЧИ"/>
+                    </StackPanel>
+                </TabItem.Header>
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="320"/>
@@ -112,17 +120,22 @@
                                                     <ColumnDefinition Width="*"/>
                                                 </Grid.ColumnDefinitions>
                                                 
-                                                <materialDesign:PackIcon Kind="FileCabinet" VerticalAlignment="Center" Margin="0,0,12,0" Opacity="0.7"/>
+                                                <materialDesign:PackIcon Kind="{Binding Status, Converter={StaticResource StatusToIconConverter}}" 
+                                                                             VerticalAlignment="Center" Margin="0,0,12,0" 
+                                                                             Foreground="{Binding Status, Converter={StaticResource StatusToColorConverter}}"/>
                                                 
                                                 <StackPanel Grid.Column="1">
                                                     <TextBlock Text="{Binding Name}" 
                                                                FontWeight="SemiBold" 
                                                                FontSize="15" 
                                                                Foreground="{DynamicResource MaterialDesignBody}"/>
-                                                    <TextBlock Text="{Binding Status}" 
-                                                               FontSize="12" 
-                                                               Opacity="0.6"
-                                                               Foreground="{DynamicResource MaterialDesignBody}"/>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="{Binding Status}" 
+                                                                   FontSize="12" 
+                                                                   Opacity="0.7"/>
+                                                        <TextBlock Text=" • " FontSize="12" Opacity="0.5"/>
+                                                        <TextBlock Text="{Binding Id}" FontSize="11" Opacity="0.5"/>
+                                                    </StackPanel>
                                                 </StackPanel>
                                             </Grid>
                                         </Border>
@@ -193,7 +206,13 @@
                 </Grid>
             </TabItem>
             
-            <TabItem Header="ИСТОРИЯ">
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="History" Margin="0,0,8,0"/>
+                        <TextBlock Text="ИСТОРИЯ"/>
+                    </StackPanel>
+                </TabItem.Header>
                 <Border Background="{DynamicResource MaterialDesignPaper}" CornerRadius="12" Padding="16" Effect="{StaticResource MaterialDesignShadowDepth1}">
                     <Grid>
                         <Grid.RowDefinitions>

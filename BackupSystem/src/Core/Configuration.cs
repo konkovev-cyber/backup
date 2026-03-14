@@ -63,6 +63,7 @@ public class JobConfig
 {
     public string Id { get; set; } = "";
     public string Name { get; set; } = "";
+    public string Status { get; set; } = "Ожидание";
     public bool Enabled { get; set; } = true;
     public List<string> SourceIds { get; set; } = new();
     public List<string> DestinationIds { get; set; } = new();

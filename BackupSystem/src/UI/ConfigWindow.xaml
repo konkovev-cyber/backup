@@ -25,7 +25,13 @@
         </Grid.RowDefinitions>
         
         <TabControl materialDesign:ColorZoneAssist.Background="{DynamicResource PrimaryHueMidBrush}">
-            <TabItem Header="Источники">
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="SourceBranch" Margin="0,0,8,0"/>
+                        <TextBlock Text="Источники"/>
+                    </StackPanel>
+                </TabItem.Header>
                 <Grid Margin="16">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="200"/>
@@ -101,7 +107,13 @@
                 </Grid>
             </TabItem>
             
-            <TabItem Header="Хранилища">
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Database" Margin="0,0,8,0"/>
+                        <TextBlock Text="Хранилища"/>
+                    </StackPanel>
+                </TabItem.Header>
                 <Grid Margin="16">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="200"/>
@@ -171,7 +183,13 @@
                 </Grid>
             </TabItem>
             
-            <TabItem Header="Задачи">
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="CalendarTask" Margin="0,0,8,0"/>
+                        <TextBlock Text="Задачи"/>
+                    </StackPanel>
+                </TabItem.Header>
                 <Grid Margin="16">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="250"/>
@@ -213,7 +231,38 @@
                             <Separator Margin="0,8,0,16"/>
                             
                             <TextBlock Text="Архивирование" Style="{DynamicResource MaterialDesignTitleMedium}" FontWeight="Bold" Margin="0,0,0,8"/>
-                            <CheckBox Content="Включить сжатие (ZIP)" IsChecked="{Binding Archiver.Enabled}" Margin="0,0,0,8"/>
+                            <CheckBox Content="Включить сжатие" IsChecked="{Binding Archiver.Enabled}" Margin="0,0,0,8"/>
+                            
+                            <StackPanel IsEnabled="{Binding Archiver.Enabled}">
+                                <Grid Margin="0,0,0,16">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0" Margin="0,0,8,0">
+                                        <TextBlock Text="Формат архива" FontWeight="Bold" Margin="0,0,0,4"/>
+                                        <ComboBox SelectedValue="{Binding Archiver.Format}" SelectedValuePath="Content">
+                                            <ComboBoxItem Content="zip"/>
+                                            <ComboBoxItem Content="7z"/>
+                                            <ComboBoxItem Content="tar"/>
+                                        </ComboBox>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1" Margin="8,0,0,0">
+                                        <TextBlock Text="Сжатие" FontWeight="Bold" Margin="0,0,0,4"/>
+                                        <ComboBox SelectedValue="{Binding Archiver.CompressionLevel}" SelectedValuePath="Content">
+                                            <ComboBoxItem Content="none"/>
+                                            <ComboBoxItem Content="fast"/>
+                                            <ComboBoxItem Content="normal"/>
+                                            <ComboBoxItem Content="max"/>
+                                            <ComboBoxItem Content="ultra"/>
+                                        </ComboBox>
+                                    </StackPanel>
+                                </Grid>
+
+                                <TextBlock Text="Пароль архива (AES-256 для 7z/ZIP)" FontWeight="Bold" Margin="0,0,0,4"/>
+                                <TextBox Text="{Binding Archiver.Password}" materialDesign:HintAssist.Hint="Оставьте пустым, если не требуется" Margin="0,0,0,16"/>
+                            </StackPanel>
+
                             <CheckBox Content="Удалять исходный файл после сжатия" IsChecked="{Binding Archiver.DeleteSourceAfterArchive}" Margin="0,0,0,16"/>
 
                             <Separator Margin="0,8,0,16"/>
@@ -276,7 +325,13 @@
                 </Grid>
             </TabItem>
             
-            <TabItem Header="Уведомления">
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Bell" Margin="0,0,8,0"/>
+                        <TextBlock Text="Уведомления"/>
+                    </StackPanel>
+                </TabItem.Header>
                 <ScrollViewer Margin="16">
                     <StackPanel>
                         <TextBlock Text="Настройки Telegram" Style="{DynamicResource MaterialDesignTitleMedium}" FontWeight="Bold" Margin="0,0,0,8"/>
@@ -317,7 +372,13 @@
                 </ScrollViewer>
             </TabItem>
 
-            <TabItem Header="Расширенные">
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Settings" Margin="0,0,8,0"/>
+                        <TextBlock Text="Расширенные"/>
+                    </StackPanel>
+                </TabItem.Header>
                 <ScrollViewer Margin="16" DataContext="{Binding SelectedItem, ElementName=JobsListBox}">
                     <StackPanel>
                         <TextBlock Text="Скрипты и автоматизация" Style="{DynamicResource MaterialDesignTitleLarge}" Margin="0,0,0,16"/>
@@ -338,7 +399,13 @@
                 </ScrollViewer>
             </TabItem>
 
-            <TabItem Header="Общие">
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="Information" Margin="0,0,8,0"/>
+                        <TextBlock Text="Общие"/>
+                    </StackPanel>
+                </TabItem.Header>
                 <ScrollViewer Margin="16">
                     <StackPanel>
                         <TextBlock Text="Папка для временных файлов" FontWeight="Bold" Margin="0,0,0,8"/>

@@ -88,7 +88,7 @@ public class Program
                 services.AddSingleton(backupConfig.Jobs);
                 
                 // Регистрация архиватора
-                services.AddSingleton<IArchiver, SharpZipArchiver>();
+                services.AddSingleton<IArchiver, MultiFormatArchiver>();
                 
                 // Регистрация источников и хранилищ через фабричные методы для DI
                 services.AddSingleton<IEnumerable<IBackupSource>>(sp => 

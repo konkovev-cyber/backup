@@ -65,6 +65,8 @@ namespace BackupSystem.UI
 
             RunBackupButton.IsEnabled = false;
             StatusText.Text = "Выполнение бекапа...";
+            job.Status = "Выполнение";
+            JobsListBox.Items.Refresh();
             
             LogTextBox.AppendText($"[{DateTime.Now:HH:mm:ss}] Запуск задачи: {job.Name}...\n");
             
@@ -93,6 +95,8 @@ namespace BackupSystem.UI
             LogTextBox.AppendText($"[{DateTime.Now:HH:mm:ss}] Бекап завершён успешно\n");
             
             RunBackupButton.IsEnabled = true;
+            job.Status = "Готово";
+            JobsListBox.Items.Refresh();
             StatusText.Text = "Готов к работе";
             LastRunText.Text = DateTime.Now.ToString("dd.MM.yyyy HH:mm");
         }
@@ -137,6 +141,38 @@ namespace BackupSystem.UI
                 }
             }
         }
+    }
+
+    public class StatusToIconConverter : System.Windows.Data.IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            var status = value?.ToString()?.ToLower() ?? "";
+            return status switch
+            {
+                "выполнение" => "PlayCircleOutline",
+                "ошибка" => "AlertCircleOutline",
+                "готово" => "CheckCircleOutline",
+                _ => "ClockOutline"
+            };
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) => throw new NotImplementedException();
+    }
+
+    public class StatusToColorConverter : System.Windows.Data.IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            var status = value?.ToString()?.ToLower() ?? "";
+            return status switch
+            {
+                "выполнение" => System.Windows.Media.Brushes.DodgerBlue,
+                "ошибка" => System.Windows.Media.Brushes.Crimson,
+                "готово" => System.Windows.Media.Brushes.SeaGreen,
+                _ => System.Windows.Media.Brushes.Gray
+            };
+        }
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture) => throw new NotImplementedException();
     }
 
     public class BooleanToStatusConverter : System.Windows.Data.IValueConverter
