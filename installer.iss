@@ -1,13 +1,20 @@
 [Setup]
 AppName=BackupSystem Professional
 AppVersion=1.0.0
-DefaultDirName={pf}\BackupSystem
+DefaultDirName={autopf}\BackupSystem
 DefaultGroupName=BackupSystem
 OutputBaseFilename=BackupSystem_Setup
+SetupIconFile=icon.ico
 Compression=lzma2/ultra64
 SolidCompression=yes
 PrivilegesRequired=admin
 ArchitecturesInstallIn64BitMode=x64
+WizardStyle=modern
+DisableDirPage=no
+DisableProgramGroupPage=no
+
+[Tasks]
+Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
 ; UI Files
@@ -16,14 +23,15 @@ Source: "publish\UI\*"; DestDir: "{app}\UI"; Flags: recursesubdirs
 Source: "publish\Service\*"; DestDir: "{app}\Service"; Flags: recursesubdirs
 
 [Icons]
-Name: "{group}\BackupSystem Professional"; Filename: "{app}\UI\BackupSystem.UI.exe"
-Name: "{commondesktop}\BackupSystem Professional"; Filename: "{app}\UI\BackupSystem.UI.exe"
+Name: "{group}\BackupSystem Professional"; Filename: "{app}\UI\BackupSystem.UI.exe"; IconFilename: "{app}\UI\BackupSystem.UI.exe"
+Name: "{commondesktop}\BackupSystem Professional"; Filename: "{app}\UI\BackupSystem.UI.exe"; Tasks: desktopicon; IconFilename: "{app}\UI\BackupSystem.UI.exe"
 
 [Run]
 ; Install and Start Service
 Filename: "sc.exe"; Parameters: "create BackupSystem binPath= ""{app}\Service\BackupSystem.Service.exe"" start= auto"; Flags: runhidden
 Filename: "sc.exe"; Parameters: "description BackupSystem ""Профессиональная система резервного копирования данных"""; Flags: runhidden
 Filename: "sc.exe"; Parameters: "start BackupSystem"; Flags: runhidden
+Filename: "{app}\UI\BackupSystem.UI.exe"; Description: "{cm:LaunchProgram,BackupSystem Professional}"; Flags: nowait postinstall skipifsilent
 
 [UninstallRun]
 ; Stop and Delete Service
